@@ -1,0 +1,29 @@
+{
+  "clients": [
+    {
+      "client_id": "7358ed9a-e63e-4798-a0b2-c1c48049283e",
+      "client_secret": "aFB/i0dkE2A-ejJvNDdIy_aAv.GAGg95",
+      "redirect_url": "https://od.cnbeining.com"
+    },
+    {
+      "client_id": "4c2d8c7b-4027-490e-b8f1-8c7eb91469fa",
+      "client_secret": "QUPAfF?gUHiGgsrB-Jpo4E?X/3U1AMP7",
+      "redirect_url": "https://od.cnbeining.com"
+    },
+    {
+      "client_id": "a2a52f00-68a3-41cc-825c-5c51063bcbc3",
+      "client_secret": "Xh8JpA/R73ZUps5Cm_.PgZlSEC=orxOz",
+      "redirect_url": "https://od.cnbeining.com"
+    },
+    {
+      "client_id": "ff9b975c-f8a7-416e-926f-6c11157a8e7d",
+      "client_secret": "9qoD/4pF1E/vWG9QVbaQDnqxojj[IdR.",
+      "redirect_url": "https://od.cnbeining.com"
+    },
+    {
+      "client_id": "7358ed9a-e63e-4798-a0b2-c1c48049283e",
+      "client_secret": "?d]57jsbA3v6An:doO.Ye4=1jrgYZKRE",
+      "redirect_url": "https://od.cnbeining.com"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+import argparse
+import os
+
+
+# Arguments
+def parse_args():
+
+    parser = argparse.ArgumentParser()
+
+    # Set the config file location
+    parser.add_argument('-chunk',
+                        default=10(*1024**2),
+                        type=int,
+                        help='Set the chunk size when uploading, use with -hack, must be times of 327680. Max is 62914560.')
+    parser.add_argument('-workers',
+                        default=10,
+                        type=int,
+                        help='Set the number of workers in multi-thread uploading')
+    # parser.add_argument('-batchnum',
+    #                     default=10,
+    #                     type=int,
+    #                     help='Set the number of batchnum in multi-thread uploading')
+    parser.add_argument('-sharelink',
+                        action='store_true',
+                        default=False)
+    
+    parser.add_argument('-step',
+                        default=102400,
+                        type=int)
+    # Set the config file location
+    parser.add_argument('-conf',
+                        default='./onedrive.json')
+
+
+    # Script actions
+    # Set mutually exclusive actions
+    parser.add_argument('mode',
+                        choices=['init_business', 'init', 'get', 'list', 'put', 'delete', 'mkdir', 'move', 'remote',
+                                 'quota', 'share', 'direct', 'search'],
+
+    # Return the parsed content
+    args, rest=parser.parse_known_args()
+    args.rest=rest
+    return args

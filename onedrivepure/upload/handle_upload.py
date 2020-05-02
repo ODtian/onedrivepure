@@ -99,8 +99,10 @@ def put(client, args):
                         time.sleep(0.05)
 
     else:
+
         links = args.rest[:-1]
         remote_base_path = args.rest[-1]
+
         if len(links) > 1:
             print('暂不支持多个分享链接，请分次上传')
         link = links[0]
@@ -108,6 +110,7 @@ def put(client, args):
         data, share_link = handle_link(
             link, args.save_dir, show_json=False
         )
+
         q = JoinableQueue()
         sleep_q = Queue()
 
@@ -136,21 +139,25 @@ def put(client, args):
                 )
                 if result is not True:
                     q.put(task)
+
             elif status == 'sleep':
                 q.put(task)
-                sleep_q.put(sleep_time)
+                if sleep_q.empty():
+                    sleep_q.put(sleep_time)
+
             elif status == 'exist':
                 message_bar(
                     remote_path='OD:'+remote_path,
                     message='文件已存在'
                 )
-            elif status == 'bad':
+            else:
                 q.put(task)
                 message_bar(
                     remote_path='OD:'+remote_path,
-                    message='错误 稍后重试'
+                    message=status+' 稍后重试'
                 )
             q.task_done()
+
         with ThreadPoolExecutor(max_workers=args.workers) as executor:
             while True:
                 if q._unfinished_tasks._semlock._is_zero():
@@ -158,7 +165,7 @@ def put(client, args):
                 if not sleep_q.empty():
                     sleep_time = sleep_q.get()
                     sleep_bar(sleep_time=sleep_time)
-                    sleep_q.queue.clear()
+                    sleep_q.task_done()
                 else:
                     try:
                         task = q.get(timeout=0.5)
@@ -167,4 +174,5 @@ def put(client, args):
                     else:
                         executor.submit(do_task, task)
                         time.sleep(0.05)
+
         return client

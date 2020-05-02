@@ -23,13 +23,13 @@ def sleep_bar(sleep_time=1):
         postfix=[message.format(sleep_time)],
         bar_format=bar_format
     )
-    return bar, message
-    # for _ in range(sleep_time):
-    #     time.sleep(1)
-    #     sleep_time -= 1
-    #     bar.postfix = \
-    #         [message.format(sleep_time)]
-    # bar.close()
+    for _ in range(sleep_time):
+        time.sleep(1)
+        bar.update(1)
+        sleep_time -= 1
+        bar.postfix = \
+            [message.format(sleep_time)]
+    bar.close()
 
 
 def count_bar(message=''):

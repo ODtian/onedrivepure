@@ -85,13 +85,14 @@ def put(client, args):
                     break
                 if not sleep_q.empty():
                     sleep_time = sleep_q.get()
-                    bar, message = sleep_bar(sleep_time=sleep_time)
-                    for _ in range(sleep_time):
-                        time.sleep(1)
-                        sleep_time -= 1
-                        bar.postfix = \
-                            [message.format(sleep_time)]
-                    bar.close()
+                    sleep_bar(sleep_time=sleep_time)
+                    # bar, message = sleep_bar(sleep_time=sleep_time)
+                    # for _ in range(sleep_time):
+                    #     time.sleep(1)
+                    #     sleep_time -= 1
+                    #     bar.postfix = \
+                    #         [message.format(sleep_time)]
+                    # bar.close()
                     sleep_q.queue.clear()
                 else:
                     try:

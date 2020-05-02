@@ -14,7 +14,7 @@ def parse_args():
                         type=int)
 
     parser.add_argument('-workers',
-                        default=10,
+                        default=5,
                         type=int)
 
     parser.add_argument('-sharelink',

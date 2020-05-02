@@ -42,11 +42,12 @@ def put(client, args):
         file_list = get_path(local_paths, remote_base_path)
 
         q = JoinableQueue()
-        sleep_q = Queue()
+        sleep_q = JoinableQueue()
 
         [q.put(i) for i in file_list]
 
         def do_task(task):
+            sleep_q.join()
             local_path, remote_path = task
 
             status, upload_url, sleep_time = \
@@ -64,7 +65,8 @@ def put(client, args):
 
             elif status == 'sleep':
                 q.put(task)
-                sleep_q.put(sleep_time)
+                if sleep_q.empty():
+                    sleep_q.put(sleep_time)
 
             elif status == 'exist':
                 message_bar(
@@ -86,7 +88,8 @@ def put(client, args):
                 if not sleep_q.empty():
                     sleep_time = sleep_q.get()
                     sleep_bar(sleep_time=sleep_time)
-                    sleep_q.queue.clear()
+                    # sleep_q.queue.clear()
+                    sleep_q.task_done()
                 else:
                     try:
                         task = q.get(timeout=0.5)

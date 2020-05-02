@@ -81,22 +81,22 @@ def put(client, args):
                 )
             q.task_done()
 
-        # with ThreadPoolExecutor(max_workers=args.workers) as executor:
-        #     while True:
-        #         if q._unfinished_tasks._semlock._is_zero():
-        #             break
-        #         if not sleep_q.empty():
-        #             sleep_time = sleep_q.get()
-        #             sleep_bar(sleep_time=sleep_time)
-        #             sleep_q.task_done()
-        #         else:
-        #             try:
-        #                 task = q.get(timeout=0.5)
-        #             except Empty:
-        #                 continue
-        #             else:
-        #                 executor.submit(do_task, task)
-        #                 time.sleep(0.05)
+        with ThreadPoolExecutor(max_workers=args.workers) as executor:
+            while True:
+                if q._unfinished_tasks._semlock._is_zero():
+                    break
+                if not sleep_q.empty():
+                    sleep_time = sleep_q.get()
+                    sleep_bar(sleep_time=sleep_time)
+                    sleep_q.task_done()
+                else:
+                    try:
+                        task = q.get(timeout=0.5)
+                    except Empty:
+                        continue
+                    else:
+                        executor.submit(do_task, task)
+                        time.sleep(0.05)
 
     else:
         links = args.rest[:-1]

@@ -20,12 +20,13 @@ def get_path(local_paths, remote_base_path):
             )
             file_list.append((path, remote_path))
         else:
+            base_path, _ = os.path.split(path)
             bar = count_bar(message='个文件夹已完成')
             for root, _, files in os.walk(path):
                 for name in files:
                     local_path = os.path.join(root, name)
                     remote_path = norm_path(
-                        os.path.join(root[len(path):], name)
+                        os.path.join(root[len(base_path):], name)
                     )
                     file_list.append((local_path, remote_path))
                 bar.postfix = [root]
@@ -40,7 +41,6 @@ def put(client, args):
 
     if not args.sharelink:
         file_list = get_path(local_paths, remote_base_path)
-
         q = JoinableQueue()
         sleep_q = JoinableQueue()
 
@@ -81,22 +81,22 @@ def put(client, args):
                 )
             q.task_done()
 
-        with ThreadPoolExecutor(max_workers=args.workers) as executor:
-            while True:
-                if q._unfinished_tasks._semlock._is_zero():
-                    break
-                if not sleep_q.empty():
-                    sleep_time = sleep_q.get()
-                    sleep_bar(sleep_time=sleep_time)
-                    sleep_q.task_done()
-                else:
-                    try:
-                        task = q.get(timeout=0.5)
-                    except Empty:
-                        continue
-                    else:
-                        executor.submit(do_task, task)
-                        time.sleep(0.05)
+        # with ThreadPoolExecutor(max_workers=args.workers) as executor:
+        #     while True:
+        #         if q._unfinished_tasks._semlock._is_zero():
+        #             break
+        #         if not sleep_q.empty():
+        #             sleep_time = sleep_q.get()
+        #             sleep_bar(sleep_time=sleep_time)
+        #             sleep_q.task_done()
+        #         else:
+        #             try:
+        #                 task = q.get(timeout=0.5)
+        #             except Empty:
+        #                 continue
+        #             else:
+        #                 executor.submit(do_task, task)
+        #                 time.sleep(0.05)
 
     else:
         links = args.rest[:-1]

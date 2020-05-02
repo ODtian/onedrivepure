@@ -34,7 +34,9 @@ def get_upload_url(client, remote_path):
         sleep_time = r.headers.get('Retry-After')
         return 'sleep', '', int(sleep_time)
     else:
-        return 'bad', '', 0
+        error = result.get('error')
+        mes = '{}:{}'.format(error.get('code'), error.get('message'))
+        return mes, '', 0
 
 
 def upload_piece(

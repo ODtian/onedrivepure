@@ -73,14 +73,14 @@ def put(client, args):
                     remote_path='OD:'+remote_path,
                     message='文件已存在'
                 )
-
-            elif status == 'bad':
+            else:
                 q.put(task)
                 message_bar(
                     remote_path='OD:'+remote_path,
-                    message='错误 稍后重试'
+                    message=status+' 稍后重试'
                 )
             q.task_done()
+
         with ThreadPoolExecutor(max_workers=args.workers) as executor:
             while True:
                 if q._unfinished_tasks._semlock._is_zero():
@@ -88,7 +88,6 @@ def put(client, args):
                 if not sleep_q.empty():
                     sleep_time = sleep_q.get()
                     sleep_bar(sleep_time=sleep_time)
-                    # sleep_q.queue.clear()
                     sleep_q.task_done()
                 else:
                     try:

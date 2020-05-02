@@ -1,2 +1,0 @@
-client_id = client_id_business = '6fdb55b4-c905-4612-bd23-306c3918217c'
-client_secret_business = 'HThkLCvKhqoxTDV9Y9uS+EvdQ72fbWr/Qrn2PFBZ/Ow='

@@ -44,8 +44,8 @@ def count_bar(message=''):
 
 def upload_bar(total, path):
     bar_format = \
-        '{desc} {percentage: >6.2f}% |{bar:20}| [{n}/{total}] '\
-        '{rate} [{elapsed}/{remaining}] [{postfix[0]}]'
+        '{desc} {percentage: >6.2f}% |{bar:20}| [{n_fmt}/{total_fmt}] '\
+        '{rate_fmt} [{elapsed}/{remaining}] [{postfix[0]}]'
     bar = tqdm(
         total=total,
         desc=get_now_time(),

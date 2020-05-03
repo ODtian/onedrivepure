@@ -47,7 +47,7 @@ def put(client, args):
         [q.put(i) for i in file_list]
 
         def do_task(task):
-            print('lock')
+            print('lock', sleep_q._unfinished_tasks._semlock._is_zero())
             sleep_q.join()
             
             local_path, remote_path = task
@@ -88,18 +88,15 @@ def put(client, args):
                 if q._unfinished_tasks._semlock._is_zero():
                     break
                 if not sleep_q.empty():
-                    print(1)
                     sleep_time = sleep_q.get()
                     sleep_bar(sleep_time=sleep_time)
                     sleep_q.task_done()
                 else:
-                    print(2)
                     try:
                         task = q.get(timeout=args.sleep_time)
                     except Empty:
                         continue
                     else:
-                        print(3, sleep_q.empty())
                         executor.submit(do_task, task)
                         time.sleep(args.sleep_time)
 

@@ -26,8 +26,10 @@ def get_path(local_paths, remote_base_path):
                 for name in files:
                     local_path = os.path.join(root, name)
                     remote_path = norm_path(os.path.join(
-                        remote_base_path, root[len(base_path)+1:], name)
-                    )
+                        remote_base_path,
+                        root[len(base_path):].strip('/'),
+                        name
+                    ))
                     file_list.append((local_path, remote_path))
                 bar.postfix = [root]
                 bar.update(1)

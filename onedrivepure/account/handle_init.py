@@ -1,12 +1,46 @@
-import time
-
 from O365 import Account, FileSystemTokenBackend
 
-from .handle_session import save_session
-from .static import default_client, default_redirect_url
+from .static import default_account_name, default_client, default_redirect_url
+import types
 
 
-def init_business(args):
+def init_business(args, init=True):
+    credentials, redirect_url = select_app(args)
+    token_backend = get_token_backend(args)
+
+    account = Account(credentials, token_backend=token_backend)
+    if init:
+        account.authenticate(
+            scopes=['basic', 'onedrive_all', 'sharepoint_dl'],
+            redirect_uri=redirect_url,
+            # notice!!! redirect_uri(i) not l !!!
+        )
+
+    def get_token(self):
+        token = self.con.token_backend.token
+        if not token:
+            token = self.con.token_backend.get_token()
+        if token.is_access_expired:
+            self.con.refresh_token()
+            token = self.con.token_backend.token
+        return token['access_token']
+
+    account.get_token = types.MethodType(get_token, account)
+
+    return account
+
+
+def get_save_name(args):
+    save_name = ''
+    if not args.save_account_name:
+        save_name = default_account_name
+    if args.app is not None:
+        save_name += '_app_'+str(args.app)
+
+    return save_name
+
+
+def select_app(args):
     if args.client_id and args.client_secret and args.redirect_url:
         credentials = (
             args.client_id,
@@ -25,18 +59,12 @@ def init_business(args):
         credentials = default_client
         redirect_url = default_redirect_url
         args.app = None
+    return credentials, redirect_url
 
-    save_dir = args.save_dir
+
+def get_token_backend(args):
     token_backend = FileSystemTokenBackend(
-        token_path=save_dir,
-        token_filename=str(int(time.time()))+'_token.json'
+        token_path=args.save_dir,
+        token_filename=get_save_name(args)+'_token.json'
     )
-    account = Account(credentials, token_backend=token_backend)
-
-    account.authenticate(
-        scopes=['basic', 'onedrive_all', 'sharepoint_dl'],
-        redirect_uri=redirect_url,
-        # notice!!! redirect_uri(i) not l !!!
-    )
-    save_session(account, args)
-    return account
+    return token_backend

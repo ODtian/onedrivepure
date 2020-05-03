@@ -1,4 +1,4 @@
-from onedrivepure.account import do_init, load_session
+from onedrivepure.account import do_init
 from onedrivepure.share_link import do_link
 from onedrivepure.upload import do_upload
 from onedrivepure.args import parse_args
@@ -6,11 +6,14 @@ from onedrivepure.args import parse_args
 
 def main():
     args = parse_args()
-    if args.mode == 'init':
-        client = do_init(args)
-        return client
-    else:
-        client = load_session(args)
+    # if args.mode == 'init':
+    #     client = do_init(args)
+    #     return client
+    # else:
+    #     client = load_session(args)
+    client = do_init(
+        args, init=(args.mode == 'init')
+    )
 
     if args.mode == 'upload':
         do_upload(client, args)

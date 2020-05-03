@@ -50,11 +50,11 @@ def put(client, args):
 
         def do_task(task):
             sleep_q.join()
-
             local_path, remote_path = task
 
             status, upload_url, sleep_time = \
                 get_upload_url(client, remote_path)
+
             if status == 'good':
                 result = upload_file(
                     local_path=local_path,
@@ -72,14 +72,14 @@ def put(client, args):
 
             elif status == 'exist':
                 message_bar(
-                    remote_path='OD:'+remote_path,
+                    remote_path='] [od:/'+remote_path,
                     message='文件已存在'
                 )
             else:
                 q.put(task)
                 message_bar(
-                    remote_path='OD:'+remote_path,
-                    message=status+' 稍后重试'
+                    remote_path='] [od:/'+remote_path,
+                    message='发生错误 (稍后重试): '+status
                 )
             q.task_done()
 

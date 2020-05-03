@@ -8,35 +8,38 @@ from ..utils.help_func import get_data, get_headers
 
 
 def get_upload_url(client, remote_path):
-    API_HOST = 'https://graph.microsoft.com/v1.0'
+    try:
+        API_HOST = 'https://graph.microsoft.com/v1.0'
 
-    url = API_HOST + \
-        '/me/drive/root:/{}:/createUploadSession'.format(remote_path)
+        url = API_HOST + \
+            '/me/drive/root:/{}:/createUploadSession'.format(remote_path)
+        headers = get_headers(client)
 
-    headers = get_headers(client)
+        data = json.dumps({
+            'item': {
+                '@microsoft.graph.conflictBehavior': 'fail',
+                'name': os.path.basename(remote_path)
+            }
+        })
 
-    data = json.dumps({
-        'item': {
-            '@microsoft.graph.conflictBehavior': 'fail',
-            'name': os.path.basename(remote_path)
-        }
-    })
+        r = requests.post(url, headers=headers, data=data)
+        result = r.json()
+        code = r.status_code
 
-    r = requests.post(url, headers=headers, data=data)
-    result = r.json()
-    code = r.status_code
+        if code == 200:
+            return 'good', result['uploadUrl'], 0
+        elif code == 409:
+            return 'exist', '', 0
+        elif code == 429:
+            sleep_time = r.headers.get('Retry-After')
+            return 'sleep', '', int(sleep_time)
+        else:
+            error = result.get('error')
+            mes = '{}:{}'.format(error.get('code'), error.get('message'))
+            return mes, '', 0
 
-    if code == 200:
-        return 'good', result['uploadUrl'], 0
-    elif code == 409:
-        return 'exist', '', 0
-    elif code == 429:
-        sleep_time = r.headers.get('Retry-After')
-        return 'sleep', '', int(sleep_time)
-    else:
-        error = result.get('error')
-        mes = '{}:{}'.format(error.get('code'), error.get('message'))
-        return mes, '', 0
+    except Exception as e:
+        return str(e), '', 0
 
 
 def upload_piece(
@@ -99,8 +102,7 @@ def try_get_remote_file(session, download_url, max_retry=5, sleep_time=1):
         if code == 200:
             return remote_file
         elif n == max_retry-1:
-            message_bar(remote_path='获取远程文件失败 {} {}'.format(
-                code, code))
+            message_bar(message='获取远程文件失败 {}'.format(code))
             return False
         else:
             time.sleep(sleep_time)
@@ -123,7 +125,7 @@ def upload_remote(
         if not remote_file:
             return False
 
-        bar = upload_bar(file_size, remote_path)
+        bar = upload_bar(file_size, 'od:/'+remote_path)
         start = 0
 
         for chunk in remote_file.iter_content(chunk_size):

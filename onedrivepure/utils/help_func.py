@@ -10,7 +10,7 @@ def get_now_time():
 
 def get_headers(client, content_type='application/json'):
     headers = {
-        'Authorization': 'bearer {}'.format(client.get_token()),
+        'Authorization': 'Bearer {}'.format(client.get_token()),
         'Content-Type': content_type
     }
     return headers

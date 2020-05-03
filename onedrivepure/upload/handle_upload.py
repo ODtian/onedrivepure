@@ -93,6 +93,7 @@ def put(client, args):
                     sleep_bar(sleep_time=sleep_time)
                     sleep_q.task_done()
                 else:
+                    print(2)
                     try:
                         task = q.get(timeout=args.sleep_time)
                     except Empty:

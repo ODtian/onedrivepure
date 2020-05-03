@@ -2,7 +2,7 @@ import os
 import time
 from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import JoinableQueue
-from queue import Queue, Empty
+from queue import Empty
 
 from ..share_link import handle_link
 from ..utils.bar_custom import count_bar, message_bar, sleep_bar
@@ -47,14 +47,11 @@ def put(client, args):
         [q.put(i) for i in file_list]
 
         def do_task(task):
-            print('lock', sleep_q._unfinished_tasks._semlock._is_zero())
             sleep_q.join()
-            
             local_path, remote_path = task
 
             status, upload_url, sleep_time = \
                 get_upload_url(client, remote_path)
-            print('unlock', status)
             if status == 'good':
                 result = upload_file(
                     local_path=local_path,

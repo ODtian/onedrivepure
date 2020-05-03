@@ -47,14 +47,14 @@ def put(client, args):
         [q.put(i) for i in file_list]
 
         def do_task(task):
-
+            print('lock')
             sleep_q.join()
             
             local_path, remote_path = task
 
             status, upload_url, sleep_time = \
                 get_upload_url(client, remote_path)
-
+            print('unlock', status)
             if status == 'good':
                 result = upload_file(
                     local_path=local_path,

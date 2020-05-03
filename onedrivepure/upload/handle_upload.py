@@ -99,7 +99,7 @@ def put(client, args):
                     except Empty:
                         continue
                     else:
-                        print(3)
+                        print(3, sleep_q.empty())
                         executor.submit(do_task, task)
                         time.sleep(args.sleep_time)
 

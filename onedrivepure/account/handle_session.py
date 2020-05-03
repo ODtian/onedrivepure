@@ -30,9 +30,15 @@ def load_session(args):
         client = dill.load(f)
 
     def get_token(self):
-        if not self.is_authenticated:
-            self.con.refresh_token()
         token = self.con.token_backend.token
+
+        if not token:
+            token = self.con.token_backend.get_token()
+
+        if token.is_access_expired:
+            self.con.refresh_token()
+            token = self.con.token_backend.token
+
         return token['access_token']
 
     client.get_token = types.MethodType(get_token, client)

@@ -6,7 +6,7 @@ from queue import Queue, Empty
 
 from ..share_link import handle_link
 from ..utils.bar_custom import count_bar, message_bar, sleep_bar
-from ..utils.help_func import norm_path
+from ..utils.help_func import norm_path, get_remote_base_path
 from .file_uploader import get_upload_url, upload_file, upload_remote
 
 
@@ -22,11 +22,11 @@ def get_path(local_paths, remote_base_path):
         else:
             base_path, _ = os.path.split(path)
             bar = count_bar(message='个文件夹已完成')
-            for root, _, files in os.walk(path):
+            for root, _, files in os.walk(norm_path(path)):
                 for name in files:
                     local_path = os.path.join(root, name)
-                    remote_path = norm_path(
-                        os.path.join(root[len(base_path):], name)
+                    remote_path = norm_path(os.path.join(
+                        remote_base_path, root[len(base_path)+1:], name)
                     )
                     file_list.append((local_path, remote_path))
                 bar.postfix = [root]
@@ -37,7 +37,7 @@ def get_path(local_paths, remote_base_path):
 
 def put(client, args):
     local_paths = args.rest[:-1]
-    remote_base_path = args.rest[-1]
+    remote_base_path = get_remote_base_path(args.rest[-1])
 
     if not args.sharelink:
         file_list = get_path(local_paths, remote_base_path)
@@ -47,6 +47,7 @@ def put(client, args):
         [q.put(i) for i in file_list]
 
         def do_task(task):
+
             sleep_q.join()
             local_path, remote_path = task
 
@@ -91,17 +92,16 @@ def put(client, args):
                     sleep_q.task_done()
                 else:
                     try:
-                        task = q.get(timeout=0.5)
+                        task = q.get(timeout=args.sleep_time)
                     except Empty:
                         continue
                     else:
                         executor.submit(do_task, task)
-                        time.sleep(0.05)
+                        time.sleep(args.sleep_time)
 
     else:
 
-        links = args.rest[:-1]
-        remote_base_path = args.rest[-1]
+        links = local_paths
 
         if len(links) > 1:
             print('暂不支持多个分享链接，请分次上传')

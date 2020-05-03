@@ -8,7 +8,7 @@ def get_save_path(args):
     if not args.save_account_name:
         args.save_account_name = default_account_name
     if args.app is not None:
-        args.save_account_name += '_' + str(args.app)
+        args.save_account_name += '_app_'+str(args.app)
     save_path = os.path.join(
         args.save_dir,
         args.save_account_name

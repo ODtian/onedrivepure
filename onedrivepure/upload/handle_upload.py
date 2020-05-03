@@ -72,13 +72,13 @@ def put(client, args):
 
             elif status == 'exist':
                 message_bar(
-                    remote_path='] [od:/'+remote_path,
+                    remote_path='od:/'+remote_path,
                     message='文件已存在'
                 )
             else:
                 q.put(task)
                 message_bar(
-                    remote_path='] [od:/'+remote_path,
+                    remote_path='od:/'+remote_path,
                     message='发生错误 (稍后重试): '+status
                 )
             q.task_done()

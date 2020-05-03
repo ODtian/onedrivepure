@@ -6,7 +6,7 @@ from queue import Empty
 
 from ..share_link import handle_link
 from ..utils.bar_custom import count_bar, message_bar, sleep_bar
-from ..utils.help_func import norm_path, get_remote_base_path
+from ..utils.help_func import get_remote_base_path, norm_path
 from .file_uploader import get_upload_url, upload_file, upload_remote
 
 
@@ -48,6 +48,7 @@ def put(client, args):
 
         def do_task(task):
             sleep_q.join()
+
             local_path, remote_path = task
 
             status, upload_url, sleep_time = \
@@ -115,9 +116,9 @@ def put(client, args):
         [q.put(t) for t in data]
 
         def do_task(task):
-            
+
             sleep_q.join()
-            
+
             download_url = task.get('download_url')
             file_size = task.get('size')
             remote_path = norm_path(os.path.join(
@@ -169,11 +170,11 @@ def put(client, args):
                     sleep_q.task_done()
                 else:
                     try:
-                        task = q.get(timeout=0.5)
+                        task = q.get(timeout=args.sleep_time)
                     except Empty:
                         continue
                     else:
                         executor.submit(do_task, task)
-                        time.sleep(0.05)
+                        time.sleep(args.sleep_time)
 
         return client

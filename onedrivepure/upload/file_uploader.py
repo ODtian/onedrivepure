@@ -162,7 +162,6 @@ def upload_remote(
         return True
 
     except Exception:
-        bar.close()
         return False
 
 

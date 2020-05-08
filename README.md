@@ -1,5 +1,5 @@
 # onedrivepure
-A CLI of onedrive witch you can upload file smoothly  
+A CLI of onedrive which you can upload file smoothly, and also get direct download url of sharelink, and upload it at same time.
 
 `pip install -r onedrivepure/requirements.txt`  
 

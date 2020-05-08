@@ -1,6 +1,8 @@
+import json
 import os
 import time
-import json
+from urllib.parse import quote
+
 import requests
 
 from ..utils.bar_custom import message_bar, upload_bar
@@ -12,7 +14,10 @@ def get_upload_url(client, remote_path):
         API_HOST = 'https://graph.microsoft.com/v1.0'
 
         url = API_HOST + \
-            '/me/drive/root:/{}:/createUploadSession'.format(remote_path)
+            quote(
+                '/me/drive/root:/{}:/createUploadSession'.format(remote_path)
+            )
+
         headers = get_headers(client)
 
         data = json.dumps({
@@ -96,16 +101,20 @@ def upload_file(local_path, upload_url, chunk_size, step_size):
 
 
 def try_get_remote_file(session, download_url, max_retry=5, sleep_time=1):
-    for n in range(max_retry):
-        remote_file = session.get(download_url, stream=True)
-        code = remote_file.status_code
-        if code == 200:
-            return remote_file
-        elif n == max_retry-1:
-            message_bar(message='获取远程文件失败 {}'.format(code))
-            return False
-        else:
-            time.sleep(sleep_time)
+    try:
+        for n in range(max_retry):
+            remote_file = session.get(download_url, stream=True)
+            code = remote_file.status_code
+            if code == 200:
+                return remote_file
+            elif n == max_retry-1:
+                message_bar(message='获取远程文件失败 {}'.format(code))
+                return False
+            else:
+                time.sleep(sleep_time)
+    except Exception as e:
+        message_bar(message='获取远程文件失败 {}'.format(str(e)))
+        return False
 
 
 def upload_remote(
@@ -143,7 +152,7 @@ def upload_remote(
             req = requests.put(upload_url, headers=headers, data=data)
             code = req.status_code
 
-            if not (code == 202 or code == 201):
+            if code != 202 and code != 201:
                 bar.close()
                 return False
 
@@ -153,6 +162,7 @@ def upload_remote(
         return True
 
     except Exception:
+        bar.close()
         return False
 
 

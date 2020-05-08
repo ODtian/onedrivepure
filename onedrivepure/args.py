@@ -10,7 +10,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-chunk',
-                        default=10*(1024**2),
+                        default=30*(1024**2),
                         type=int)
 
     parser.add_argument('-workers',
@@ -22,7 +22,7 @@ def parse_args():
                         default=False)
 
     parser.add_argument('-step',
-                        default=1024*100,
+                        default=1024**2,
                         type=int)
 
     parser.add_argument('-app',

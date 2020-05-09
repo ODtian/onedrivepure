@@ -31,13 +31,14 @@ def init_business(args, init=True):
 
 
 def get_save_name(args):
-    save_name = ''
-    if not args.save_account_name:
-        save_name = default_account_name
-    if args.app is not None:
-        save_name += '_app_'+str(args.app)
 
-    return save_name
+    if not args.save_account_name:
+        args.save_account_name = default_account_name
+
+    if args.app is not None:
+        args.save_account_name += '_app_'+str(args.app)
+
+    return args.save_account_name
 
 
 def select_app(args):

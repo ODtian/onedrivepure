@@ -38,12 +38,10 @@ def get_path(local_paths, remote_base_path):
 def put(client, args):
     local_paths = args.rest[:-1]
     remote_base_path = get_remote_base_path(args.rest[-1])
-
+    q = JoinableQueue()
+    sleep_q = JoinableQueue()
     if not args.sharelink:
         file_list = get_path(local_paths, remote_base_path)
-        q = JoinableQueue()
-        sleep_q = JoinableQueue()
-
         [q.put(i) for i in file_list]
 
         def do_task(task):
@@ -76,22 +74,6 @@ def put(client, args):
                 )
             q.task_done()
 
-        with ThreadPoolExecutor(max_workers=args.workers) as executor:
-            while True:
-                if q._unfinished_tasks._semlock._is_zero():
-                    break
-                elif not sleep_q.empty():
-                    sleep_time = sleep_q.get()
-                    sleep_bar(sleep_time=sleep_time)
-                    sleep_q.task_done()
-                else:
-                    try:
-                        task = q.get(timeout=args.sleep_time)
-                    except Empty:
-                        continue
-                    else:
-                        executor.submit(do_task, task)
-                        time.sleep(args.sleep_time)
     else:
 
         links = local_paths
@@ -142,21 +124,21 @@ def put(client, args):
                 message_bar(remote_path="OD:" + remote_path, message=status + " 稍后重试")
             q.task_done()
 
-        with ThreadPoolExecutor(max_workers=args.workers) as executor:
-            while True:
-                if q._unfinished_tasks._semlock._is_zero():
-                    break
-                if not sleep_q.empty():
-                    sleep_time = sleep_q.get()
-                    sleep_bar(sleep_time=sleep_time)
-                    sleep_q.task_done()
+    with ThreadPoolExecutor(max_workers=args.workers) as executor:
+        while True:
+            if q._unfinished_tasks._semlock._is_zero():
+                break
+            elif not sleep_q.empty():
+                sleep_time = sleep_q.get()
+                sleep_bar(sleep_time=sleep_time)
+                sleep_q.task_done()
+            else:
+                try:
+                    task = q.get(timeout=args.sleep_time)
+                except Empty:
+                    continue
                 else:
-                    try:
-                        task = q.get(timeout=args.sleep_time)
-                    except Empty:
-                        continue
-                    else:
-                        executor.submit(do_task, task)
-                        time.sleep(args.sleep_time)
+                    executor.submit(do_task, task)
+                    time.sleep(args.sleep_time)
 
-        return client
+    return client

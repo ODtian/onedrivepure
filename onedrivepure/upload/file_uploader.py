@@ -23,7 +23,7 @@ def get_upload_url(client, remote_path):
             {
                 "item": {
                     "@microsoft.graph.conflictBehavior": "fail",
-                    "name": os.path.basename(remote_path),
+                    # "name": os.path.basename(remote_path),
                 }
             }
         )

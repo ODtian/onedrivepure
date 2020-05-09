@@ -19,14 +19,7 @@ def get_upload_url(client, remote_path):
 
         headers = get_headers(client)
 
-        data = json.dumps(
-            {
-                "item": {
-                    "@microsoft.graph.conflictBehavior": "fail",
-                    # "name": os.path.basename(remote_path),
-                }
-            }
-        )
+        data = json.dumps({"item": {"@microsoft.graph.conflictBehavior": "fail"}})
 
         r = requests.post(url, headers=headers, data=data)
         result = r.json()
@@ -69,6 +62,8 @@ def upload_piece(upload_url, local_path, file_range, file_size, step_size, bar):
 def upload_file(local_path, upload_url, chunk_size, step_size):
     try:
         file_size = os.path.getsize(local_path)
+        if file_size == 0:
+            message_bar(remote_path=local_path, message="发生错误 (稍后重试): 文件为空")
         range_list = [[i, i + chunk_size - 1] for i in range(0, file_size, chunk_size)]
         range_list[-1][-1] = file_size - 1
 

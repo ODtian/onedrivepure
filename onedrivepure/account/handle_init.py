@@ -11,7 +11,7 @@ def init_business(args, init=True):
     account = Account(credentials, token_backend=token_backend)
     if init:
         account.authenticate(
-            scopes=['basic', 'onedrive_all', 'sharepoint_dl'],
+            scopes=["basic", "onedrive_all", "sharepoint_dl"],
             redirect_uri=redirect_url,
             # notice!!! redirect_uri(i) not l !!!
         )
@@ -23,7 +23,7 @@ def init_business(args, init=True):
         if token.is_access_expired:
             self.con.refresh_token()
             token = self.con.token_backend.token
-        return token['access_token']
+        return token["access_token"]
 
     account.get_token = types.MethodType(get_token, account)
 
@@ -36,26 +36,20 @@ def get_save_name(args):
         args.save_account_name = default_account_name
 
     if args.app is not None:
-        args.save_account_name += '_app_'+str(args.app)
+        args.save_account_name += "_app_" + str(args.app)
 
     return args.save_account_name
 
 
 def select_app(args):
     if args.client_id and args.client_secret and args.redirect_url:
-        credentials = (
-            args.client_id,
-            args.client_secret
-        )
+        credentials = (args.client_id, args.client_secret)
         redirect_url = args.redirect_url
         args.app = None
-    elif hasattr(args, 'clients'):
+    elif hasattr(args, "clients"):
         client = args.clients[args.app]
-        credentials = (
-            client.get('client_id'),
-            client.get('client_secret')
-        )
-        redirect_url = client.get('redirect_url')
+        credentials = (client.get("client_id"), client.get("client_secret"))
+        redirect_url = client.get("redirect_url")
     else:
         credentials = default_client
         redirect_url = default_redirect_url
@@ -65,7 +59,6 @@ def select_app(args):
 
 def get_token_backend(args):
     token_backend = FileSystemTokenBackend(
-        token_path=args.save_dir,
-        token_filename=get_save_name(args)+'_token.json'
+        token_path=args.save_dir, token_filename=get_save_name(args) + "_token.json"
     )
     return token_backend

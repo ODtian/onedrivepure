@@ -36,22 +36,16 @@ class Shop:
             #     self.product_queue.put(result)
 
     def consumer(self, max_workers=10, sleep_time=1):
-        thread_status = {
-            'submitted': 0,
-            'finished': 0
-        }
+        thread_status = {"submitted": 0, "finished": 0}
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             while True:
-                shopping = \
-                    thread_status['submitted'] - \
-                    thread_status['finished']
+                shopping = thread_status["submitted"] - thread_status["finished"]
 
                 thread_nowait = max_workers >= shopping
                 thread_empty = shopping == 0
-                queue_empty = \
-                    self.raw_queue.empty() and self.product_queue.empty()
+                queue_empty = self.raw_queue.empty() and self.product_queue.empty()
                 if queue_empty and thread_empty:
-                    self.raw_queue.put('_finished')
+                    self.raw_queue.put("_finished")
                     self.on_finish(self)
                     break
                 elif not thread_nowait:
@@ -61,23 +55,20 @@ class Shop:
                     def callback(res):
                         if self.callback_func:
                             self.callback_func(res, self.raw_queue)
-                        thread_status['finished'] += 1
-                        self.product_queue.put('_refresh')
+                        thread_status["finished"] += 1
+                        self.product_queue.put("_refresh")
 
                     task = self.product_queue.get()
 
-                    if task == '_refresh':
+                    if task == "_refresh":
                         continue
-                    thread_status['submitted'] += 1
+                    thread_status["submitted"] += 1
                     future = self.consumer_func(executor, task)
                     future.add_done_callback(callback)
 
     def run(self, max_workers=10, sleep_time=1):
         producer_thread = Thread(target=self.producer)
-        consumer_thread = Thread(
-            target=self.consumer,
-            args=(max_workers, sleep_time)
-        )
+        consumer_thread = Thread(target=self.consumer, args=(max_workers, sleep_time))
         producer_thread.start()
         consumer_thread.start()
 

@@ -15,21 +15,19 @@ def get_path(local_paths, remote_base_path):
     for path in local_paths:
         if os.path.isfile(path):
             name = os.path.basename(path)
-            remote_path = norm_path(
-                os.path.join(remote_base_path, name)
-            )
+            remote_path = norm_path(os.path.join(remote_base_path, name))
             file_list.append((path, remote_path))
         else:
             base_path, _ = os.path.split(path)
-            bar = count_bar(message='个文件夹已完成')
+            bar = count_bar(message="个文件夹已完成")
             for root, _, files in os.walk(norm_path(path)):
                 for name in files:
                     local_path = os.path.join(root, name)
-                    remote_path = norm_path(os.path.join(
-                        remote_base_path,
-                        root[len(base_path):].strip('/'),
-                        name
-                    ))
+                    remote_path = norm_path(
+                        os.path.join(
+                            remote_base_path, root[len(base_path) :].strip("/"), name
+                        )
+                    )
                     file_list.append((local_path, remote_path))
                 bar.postfix = [root]
                 bar.update(1)
@@ -52,34 +50,29 @@ def put(client, args):
             sleep_q.join()
             local_path, remote_path = task
 
-            status, upload_url, sleep_time = \
-                get_upload_url(client, remote_path)
+            status, upload_url, sleep_time = get_upload_url(client, remote_path)
 
-            if status == 'good':
+            if status == "good":
                 result = upload_file(
                     local_path=local_path,
                     upload_url=upload_url,
                     chunk_size=args.chunk,
-                    step_size=args.step
+                    step_size=args.step,
                 )
                 if result is not True:
                     q.put(task)
 
-            elif status == 'sleep':
+            elif status == "sleep":
                 q.put(task)
                 if sleep_q.empty():
                     sleep_q.put(sleep_time)
 
-            elif status == 'exist':
-                message_bar(
-                    remote_path='od:/'+remote_path,
-                    message='文件已存在'
-                )
+            elif status == "exist":
+                message_bar(remote_path="od:/" + remote_path, message="文件已存在")
             else:
                 q.put(task)
                 message_bar(
-                    remote_path='od:/'+remote_path,
-                    message='发生错误 (稍后重试): '+status
+                    remote_path="od:/" + remote_path, message="发生错误 (稍后重试): " + status
                 )
             q.task_done()
 
@@ -104,12 +97,10 @@ def put(client, args):
         links = local_paths
 
         if len(links) > 1:
-            print('暂不支持多个分享链接，请分次上传')
+            print("暂不支持多个分享链接，请分次上传")
         link = links[0]
 
-        data, share_link = handle_link(
-            link, args.save_dir, show_json=False
-        )
+        data, share_link = handle_link(link, args.save_dir, show_json=False)
 
         q = JoinableQueue()
         sleep_q = JoinableQueue()
@@ -120,17 +111,13 @@ def put(client, args):
 
             sleep_q.join()
 
-            download_url = task.get('download_url')
-            file_size = task.get('size')
-            remote_path = norm_path(os.path.join(
-                remote_base_path,
-                task.get('path')
-            ))
+            download_url = task.get("download_url")
+            file_size = task.get("size")
+            remote_path = norm_path(os.path.join(remote_base_path, task.get("path")))
 
-            status, upload_url, sleep_time = \
-                get_upload_url(client, remote_path)
+            status, upload_url, sleep_time = get_upload_url(client, remote_path)
 
-            if status == 'good':
+            if status == "good":
                 result = upload_remote(
                     download_url=download_url,
                     upload_url=upload_url,
@@ -138,27 +125,21 @@ def put(client, args):
                     file_size=file_size,
                     remote_path=remote_path,
                     chunk_size=args.chunk,
-                    step_size=args.step
+                    step_size=args.step,
                 )
                 if result is not True:
                     q.put(task)
 
-            elif status == 'sleep':
+            elif status == "sleep":
                 q.put(task)
                 if sleep_q.empty():
                     sleep_q.put(sleep_time)
 
-            elif status == 'exist':
-                message_bar(
-                    remote_path='OD:'+remote_path,
-                    message='文件已存在'
-                )
+            elif status == "exist":
+                message_bar(remote_path="OD:" + remote_path, message="文件已存在")
             else:
                 q.put(task)
-                message_bar(
-                    remote_path='OD:'+remote_path,
-                    message=status+' 稍后重试'
-                )
+                message_bar(remote_path="OD:" + remote_path, message=status + " 稍后重试")
             q.task_done()
 
         with ThreadPoolExecutor(max_workers=args.workers) as executor:

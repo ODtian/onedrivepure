@@ -15,7 +15,7 @@ class dataIter:
     def __iter__(self):
         range = self.get_range()
         for i in range:
-            step = self.get_step(i, i+self.step_size)
+            step = self.get_step(i, i + self.step_size)
             yield step
             self.bar.update(len(step))
 

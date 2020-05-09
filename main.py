@@ -11,14 +11,12 @@ def main():
     #     return client
     # else:
     #     client = load_session(args)
-    client = do_init(
-        args, init=(args.mode == 'init')
-    )
+    client = do_init(args, init=(args.mode == "init"))
 
-    if args.mode == 'upload':
+    if args.mode == "upload":
         do_upload(client, args)
 
-    elif args.mode == 'link':
+    elif args.mode == "link":
         do_link(args)
     # elif args.mode == 'put':
     #     do_put(client, args)
@@ -48,5 +46,5 @@ def main():
     #     do_quota(client, args)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

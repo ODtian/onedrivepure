@@ -42,7 +42,7 @@ def count_bar(message=''):
     return bar
 
 
-def upload_bar(total, path):
+def upload_bar(total=0, path=''):
     bar_format = \
         '{desc} {percentage: >6.2f}% |{bar:20}| [{n_fmt}/{total_fmt}] '\
         '{rate_fmt} [{elapsed}/{remaining}] [{postfix[0]}]'

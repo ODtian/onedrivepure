@@ -87,7 +87,7 @@ def put(client, args):
             while True:
                 if q._unfinished_tasks._semlock._is_zero():
                     break
-                if not sleep_q.empty():
+                elif not sleep_q.empty():
                     sleep_time = sleep_q.get()
                     sleep_bar(sleep_time=sleep_time)
                     sleep_q.task_done()
@@ -99,7 +99,6 @@ def put(client, args):
                     else:
                         executor.submit(do_task, task)
                         time.sleep(args.sleep_time)
-
     else:
 
         links = local_paths

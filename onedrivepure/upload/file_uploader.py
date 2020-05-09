@@ -81,7 +81,7 @@ def upload_file(local_path, upload_url, chunk_size, step_size):
         ]
         range_list[-1][-1] = file_size - 1
 
-        bar = upload_bar(file_size, local_path)
+        bar = upload_bar(total=file_size, path=local_path)
         for file_range in range_list:
             code = upload_piece(
                 upload_url=upload_url,
@@ -134,9 +134,12 @@ def upload_remote(
         if not remote_file:
             return False
 
-        bar = upload_bar(file_size, 'od:/'+remote_path)
-        start = 0
+        bar = upload_bar(
+            total=file_size,
+            path='od:/'+remote_path
+        )
 
+        start = 0
         for chunk in remote_file.iter_content(chunk_size):
             content_length = len(chunk)
             end = start + content_length - 1

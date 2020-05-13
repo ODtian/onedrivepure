@@ -1,4 +1,3 @@
 requests
-dill
 O365
 tqdm

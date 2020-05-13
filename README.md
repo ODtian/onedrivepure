@@ -5,5 +5,5 @@ A CLI of onedrive which you can upload file smoothly, and also get direct downlo
 
 `python onedrivepure/main.py init -app 0 -save-account-name 1`  
 
-`python onedrivepure/main.py upload // od:/ -app 0 -save-account-name 1`  
+`python onedrivepure/main.py upload /local/path/here od:/remote/path/here -app 0 -save-account-name 1`  
 

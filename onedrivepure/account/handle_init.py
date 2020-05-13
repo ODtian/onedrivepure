@@ -15,19 +15,20 @@ def init_business(args, init=True):
             redirect_uri=redirect_url,
             # notice!!! redirect_uri(i) not l !!!
         )
+    else:
 
-    def get_token(self):
-        token = self.con.token_backend.token
-        if not token:
-            token = self.con.token_backend.get_token()
-        if token.is_access_expired:
-            self.con.refresh_token()
+        def get_token(self):
             token = self.con.token_backend.token
-        return token["access_token"]
+            if not token:
+                token = self.con.token_backend.get_token()
+            if token.is_access_expired:
+                self.con.refresh_token()
+                token = self.con.token_backend.token
+            return token["access_token"]
 
-    account.get_token = types.MethodType(get_token, account)
+        account.get_token = types.MethodType(get_token, account)
 
-    return account
+        return account
 
 
 def get_save_name(args):

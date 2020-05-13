@@ -1,6 +1,6 @@
 import time
 
-from tqdm import tqdm
+from tqdm.autonotebook import tqdm
 
 from .help_func import get_now_time
 

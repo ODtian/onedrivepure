@@ -77,7 +77,7 @@ def upload_file(local_path, upload_url, chunk_size, step_size):
                 step_size=step_size,
                 bar=bar,
             )
-            if not (code == 202 or code == 201):
+            if code not in (201, 202):
                 bar.close()
                 return False
         bar.close()
